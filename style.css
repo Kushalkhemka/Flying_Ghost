@@ -5,3 +5,7 @@ html, body {
 canvas {
   display: block;
 }
+.item{
+  top: 50%;
+  left:50%;
+}
