@@ -16,20 +16,24 @@ var coinGroup;
 var pillar1, pillar2,pillar1_img,pillar2_img;
 var pillarGroup;
 var player_walk;
-
-var PLAY=1;
+var INITIAL;
+var START=1
+var PLAY=2;
 var END=0;
-var gameState=PLAY;
+var gameState=START;
 var score=0;
 var player_health=3;
 var player_collide,player_jump;
 
 var groundobs,groundobs_img,groundobsGroup;
-var coinsound,diesound,jumpsound,gameOverSound;
+var coinsound,diesound,jumpsound,gameOverSound,healing_sound,mushroomJump_sound;
 
 var obstacle_img1,obstacle_img2,obstacle_img3,obstacle_img4,obstacle_img5;
 var powerups,powerups_img,powerupsGroup;
 var groundjump,groundjump_img,groundjumpGroup;
+
+var howtoplay, play,howtoplay_img,play_img;
+
 
 function preload()
 {
@@ -65,9 +69,16 @@ function preload()
   jumpsound=loadSound("jump.mp3");
   diesound=loadSound("die.mp3");
   gameOverSound=loadSound("gameOver.mp3");
+  healing_sound=loadSound("healing_sound.wav");
+  mushroomJump_sound=loadSound("mushroom_jump.mp3");
 
   powerups_img=loadImage("Powerup.png");
-  groundjump_img=loadImage("baseobsjump.png")
+  groundjump_img=loadImage("baseobsjump.png");
+
+  howtoplay_img=loadImage("howtoplay.png");
+  play_img=loadImage("playbutton4.png");
+
+
 
 }
 
@@ -98,6 +109,15 @@ function setup() {
   groundjumpGroup=new Group();
 
   player.scale=0.3;
+
+  howtoplay=createSprite(150,100,10,10);
+  howtoplay.addImage(howtoplay_img);
+  howtoplay.scale=0.4;
+
+  play=createSprite(400,500,10,10);
+  play.addImage(play_img);
+  play.scale=0.08;
+  
 }
 
 function draw() {
@@ -109,8 +129,56 @@ function draw() {
   text("Health: "+player_health,650,30);
   text("Score: "+score,50,30);
 
-  if(gameState===PLAY)
+  
+
+  if(gameState===START)
   {
+    background("black");
+    fill("white");
+    push();
+    strokeWeight(1.5);
+    stroke("yellow");
+    textAlign(CENTER);
+    textSize(35);
+    text("Flying Ghost",380,50);
+    pop();
+    textSize(20);
+    //text("Read all the instructions carefully before playing the game",50,100);
+    textSize(18);
+    text("1. Press UP_ARROW to jump & LEFT_Arrow to move left",30,100+50);
+    text("2. Press RIGHT_ARROW to move right",30,150+30);
+    text("3. Try to collect healing flower to increase your health",30,180+30);
+    text("4. Try to avoid pointy bushes and SlimeOrange",30,210+30);
+    text("5. To jump high use blue mushroom",30,240+30);
+    text("6. Collect more and more coins to increase your score",30,270+30);
+    text("7. Don't let player go out of the game from left side otherwise game will get over",30,300+30);
+    text("8. Health must not turn ZERO otherwise game will get over",30,330+30);
+    text("9. Avoid touching the toxic plants from left side otherwise player will move backward",30,390);
+    text("10. Click on the play button to start the game",30,420);
+    
+    
+    if(mousePressedOver(play))
+    {
+      gameState=PLAY;
+    }
+   
+    
+
+    /*if(keyDown("space"))
+    {
+      gameState=PLAY;
+    }*/
+
+    ground.visible=false;
+    player.visible=false;
+
+  }
+  else if(gameState===PLAY)
+  {
+    howtoplay.visible=false;
+    play.visible=false;
+    ground.visible=true;
+    player.visible=true;
     player.changeAnimation("walk");
     ground.velocityX=-5;
 
@@ -186,6 +254,7 @@ function draw() {
     {
       player_health+=1;
       powerupsGroup.destroyEach();
+      healing_sound.play();
     }
 
     //groundjumpGroup.collide(player);
@@ -195,12 +264,14 @@ function draw() {
     {
       player.velocityY=-(player.velocityY+random(4,10));
      // console.log("Jump");
-      
+      mushroomJump_sound.play();
     }
 
   }
   else
   {
+    howtoplay.visible=false;
+    play.visible=false;
    
     player.changeAnimation("collide");
     ground.velocityX=0;
